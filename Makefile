@@ -10,7 +10,4 @@ setup:
 	uv venv && uv pip sync
 
 run:
-	uv run python3 main.py
-
-ui:
 	streamlit run main.py

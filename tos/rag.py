@@ -18,7 +18,7 @@ class RAG:
         top_k (int): Number of top matching documents to retrieve.
     """
 
-    def __init__(self, llm_model: str = "llama3.2", top_k: int = 3):
+    def __init__(self, llm_model: str = "llama3.2", top_k: int = 5):
         self.db = DB()
         self.llm_model = llm_model
         self.top_k = top_k

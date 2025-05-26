@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from tos.chunk import Chunk
 from tos.utils import BASE_PATH
 
-ZIP_PATH = BASE_PATH / "sampledata/docs.zip"
+# ZIP_PATH = BASE_PATH / "sampledata/docs.zip"
 
 
 class HTMLDumpProcessor:
@@ -59,7 +59,7 @@ class HTMLDumpProcessor:
         os.makedirs(self.__extract_dir, exist_ok=True)
         with zipfile.ZipFile(self.__zip_path, "r") as z_ref:
             z_ref.extractall(self.__extract_dir)
-        print("👋🏻 - Extracted HTML dump")
+        print(f"👋🏻 - Extracted HTML dump from {self.__zip_path}")
 
     def __html_to_text(self, file_path: Path) -> str | None:
         try:
@@ -71,13 +71,18 @@ class HTMLDumpProcessor:
 
         soup = BeautifulSoup(content, "html.parser")
 
-        return soup.get_text(separator=" ").strip()
+        for tag in soup(["script", "style"]):
+            tag.decompose()
+
+        text = soup.get_text(separator=" ").strip()
+        return text if text else None
 
     def __extract_chunk(self) -> Generator[Chunk, Any, None]:
         def is_valid_file(file: str) -> bool:
             ext = os.path.splitext(file)[-1].lower()
-            return ext == ".html" and not file.startswith("._")
+            return ext in [".html", ".htm"] and not file.startswith("._")
 
+        count = 0
         for root, _, files in os.walk(self.__extract_dir):
             for file in files:
                 if is_valid_file(file):
@@ -90,10 +95,13 @@ class HTMLDumpProcessor:
                             text=extracted_text,
                             meta={"source": str(file_path)},
                         )
+                        count += 1
+                    else:
+                        print(f"🚫 No extractable content in: {file_path} ")
 
-        print("✅ - Finished processing HTML dump")
+        print(f"✅ - Finished processing HTML dump. Total valid chunks: {count}")
 
     def start(self) -> Generator[Chunk, Any, None]:
         print("🤖 - Starting to process html dump")
         self.__extract_dump()
-        return self.__extract_chunk()
+        yield from self.__extract_chunk()

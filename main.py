@@ -2,8 +2,7 @@ import streamlit as st
 
 from tos.rag import RAG
 
-st.set_page_config(page_title="Soltek AI Assistant", layout="centered")
-st.set_page_config(page_icon="🪐")
+st.set_page_config(page_title="TOS", page_icon="🪐", layout="centered")
 
 rag = RAG()
 
@@ -26,7 +25,7 @@ if query:
 
 # THEN render the sidebar (after history is updated)
 with st.sidebar:
-    st.title("🧠 Soltek AI Assistant")
+    st.title("🪐 TOS")
     st.markdown("I am currently trained in APR user help docs — ask me anything!")
 
     st.header("💬 Chat History")
